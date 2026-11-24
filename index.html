@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drvce Coffee House — Meni i Google recenzije</title>
+  <style>
+    :root {
+      --bg: #f6f2ec;
+      --card: #fffdf9;
+      --ink: #231b15;
+      --muted: #6b5b4f;
+      --accent: #5c3a21;
+      --accent-2: #8c5832;
+      --border: #e5ddd2;
+      --star: #d9822b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2d1e14, #5c3a21);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.8rem;
+      letter-spacing: 0.3px;
+    }
+
+    header p {
+      margin: 0;
+      color: #efe4d8;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 16px rgba(35, 27, 21, 0.04);
+    }
+
+    h2 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--ink);
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .drink-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .drink-name {
+      font-weight: 600;
+      font-size: 0.98rem;
+    }
+
+    .drink-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .drink-price {
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+      font-size: 0.92rem;
+      text-align: right;
+    }
+
+    .google-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .stars-preview {
+      color: var(--star);
+      font-size: 1.35rem;
+      letter-spacing: 2px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    select {
+      width: 100%;
+      max-width: 420px;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid #cfc3b4;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .google-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.8rem 1.3rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      width: fit-content;
+      transition: background 0.15s ease;
+    }
+
+    .google-btn:hover {
+      background: var(--accent-2);
+    }
+
+    .helper-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Drvce Coffee House</h1>
+    <p>Meni i Google recenzije</p>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Meni</h2>
+      <div class="filters" id="categoryFilters"></div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <section>
+      <h2>Ostavi recenziju na Googleu</h2>
+      <div class="google-box">
+        <div class="stars-preview" aria-hidden="true">★★★★★</div>
+        <p style="margin: 0;">
+          Svideo ti se boravak kod nas? Ostavi javnu recenziju direktno na našem <strong>Google profilu</strong> kako bi i drugi gosti lakše pronašli Drvce Coffee House.
+        </p>
+
+        <div>
+          <label for="drinkHint">Šta si danas probao/la? (opciono — da lakše upišeš u recenziju)</label>
+          <select id="drinkHint"></select>
+        </div>
+
+        <a
+          id="googleReviewLink"
+          class="google-btn"
+          href="https://g.page/r/CbPkO3VloYYCEAE/review"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Oceni nas na Googleu
+        </a>
+
+        <p class="helper-note">
+          Otvara Google stranicu za recenzije u novom prozoru (potreban je Google nalog).
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const GOOGLE_REVIEW_URL = "https://g.page/r/CbPkO3VloYYCEAE/review";
+
+    const MENU_ITEMS = [
+      // KAFE I TOPLI NAPICI
+      { name: "Espresso", category: "Kafe i topli napici", price: "210 RSD", desc: "" },
+      { name: "Amerikano", category: "Kafe i topli napici", price: "210 RSD", desc: "" },
+      { name: "Dupli espresso", category: "Kafe i topli napici", price: "310 RSD", desc: "" },
+      { name: "Dupli espresso sa mlekom", category: "Kafe i topli napici", price: "350 RSD", desc: "" },
+      { name: "Espresso sa mlekom", category: "Kafe i topli napici", price: "240 RSD", desc: "" },
+      { name: "Cappuccino", category: "Kafe i topli napici", price: "260 RSD", desc: "" },
+      { name: "Latte", category: "Kafe i topli napici", price: "280 RSD", desc: "" },
+      { name: "Latte sa ukusom", category: "Kafe i topli napici", price: "310 RSD", desc: "" },
+      { name: "Espresso sa biljnim mlekom", category: "Kafe i topli napici", price: "300 RSD", desc: "" },
+      { name: "Espresso - Tonik 0,3", category: "Kafe i topli napici", price: "330 RSD", desc: "" },
+      { name: "Domaća kafa", category: "Kafe i topli napici", price: "210 RSD", desc: "" },
+      { name: "Ness kafa", category: "Kafe i topli napici", price: "260 RSD", desc: "" },
+      { name: "Ness sa biljnim mlekom", category: "Kafe i topli napici", price: "300 RSD", desc: "" },
+      { name: "Ness kafa sa ukusom", category: "Kafe i topli napici", price: "300 RSD", desc: "" },
+      { name: "Irska kafa", category: "Kafe i topli napici", price: "420 RSD", desc: "Jameson, espresso, braon šećer, šlag" },
+      { name: "Moka", category: "Kafe i topli napici", price: "370 RSD", desc: "Espresso, mleko, čokolada, šlag" },
+      { name: "Čaj 0,3", category: "Kafe i topli napici", price: "230 RSD", desc: "Nana, kamilica, zeleni, crni, voćni" },
+      { name: "Čaj sa medovačom 0,3", category: "Kafe i topli napici", price: "320 RSD", desc: "Čaj, medovača, limun, med, cimet" },
+      { name: "Čaj za dvoje 0,5", category: "Kafe i topli napici", price: "500 RSD", desc: "Čaj, sezonsko voće, limun, med" },
+      { name: "Topla čokolada", category: "Kafe i topli napici", price: "270 RSD", desc: "Crna i bela" },
+      { name: "Topla čokolada sa ukusom", category: "Kafe i topli napici", price: "310 RSD", desc: "" },
+      { name: "Topla čokolada sa ukusom i šlagom", category: "Kafe i topli napici", price: "350 RSD", desc: "" },
+      { name: "Kuvano vino", category: "Kafe i topli napici", price: "330 RSD", desc: "Belo/crveno vino, cimet, narandža, šećer" },
+      { name: "Kuvano vino sa ukusom", category: "Kafe i topli napici", price: "370 RSD", desc: "Belo/crveno vino, cimet, narandža, sirup" },
+      { name: "Kuvani Džin 0,25", category: "Kafe i topli napici", price: "420 RSD", desc: "Džin, sok od jabuke, limun, cimet" },
+      { name: "Zlatno mleko", category: "Kafe i topli napici", price: "250 RSD", desc: "Med, kurkuma, cimet" },
+
+      // DODACI
+      { name: "Šlag", category: "Dodaci", price: "40 RSD", desc: "" },
+      { name: "Limun", category: "Dodaci", price: "40 RSD", desc: "" },
+      { name: "Đumbir", category: "Dodaci", price: "60 RSD", desc: "" },
+      { name: "Biljno mleko", category: "Dodaci", price: "60 RSD", desc: "" },
+
+      // VODE
+      { name: "Aqua Viva 0,33", category: "Vode", price: "220 RSD", desc: "" },
+      { name: "Aqua Viva 1 l", category: "Vode", price: "340 RSD", desc: "" },
+      { name: "Knjaz Miloš 0,25", category: "Vode", price: "220 RSD", desc: "" },
+      { name: "Knjaz Miloš 1 l", category: "Vode", price: "340 RSD", desc: "" },
+      { name: "Knjaz Miloš remix 0,33", category: "Vode", price: "280 RSD", desc: "" },
+
+      // SVEŽE CEĐENO VOĆE I MIXEVI
+      { name: "Ceđena pomorandža 0,3", category: "Sveže ceđeno voće i mixevi", price: "360 RSD", desc: "" },
+      { name: "Ceđena jabuka 0,3", category: "Sveže ceđeno voće i mixevi", price: "330 RSD", desc: "" },
+      { name: "Ceđeni grejp 0,2", category: "Sveže ceđeno voće i mixevi", price: "330 RSD", desc: "" },
+      { name: "Limunada 0,3", category: "Sveže ceđeno voće i mixevi", price: "230 RSD", desc: "" },
+      { name: "Limunada 1l", category: "Sveže ceđeno voće i mixevi", price: "460 RSD", desc: "" },
+      { name: "Limunada sa ukusom 0,3", category: "Sveže ceđeno voće i mixevi", price: "290 RSD", desc: "" },
+      { name: "Penušava limunada 0,3", category: "Sveže ceđeno voće i mixevi", price: "300 RSD", desc: "Limun, kisela voda, sirup" },
+      { name: "Zdravko 0,3", category: "Sveže ceđeno voće i mixevi", price: "450 RSD", desc: "Limun, pomorandža, đumbir" },
+      { name: "Vitaminko 0,3", category: "Sveže ceđeno voće i mixevi", price: "450 RSD", desc: "Limun, grejp, pomorandža, med" },
+      { name: "Freško 0,3", category: "Sveže ceđeno voće i mixevi", price: "Po upitu", desc: "Pomorandža, jabuka" },
+      { name: "Domaći ledeni čaj 0,3", category: "Sveže ceđeno voće i mixevi", price: "310 RSD", desc: "Čaj, limun, sirup" },
+      { name: "Sok od zove 0,3", category: "Sveže ceđeno voće i mixevi", price: "250 RSD", desc: "" },
+      { name: "Sok od lavande 0,3", category: "Sveže ceđeno voće i mixevi", price: "250 RSD", desc: "" },
+
+      // SOKOVI I ENERGETSKI NAPICI
+      { name: "Pepsi 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Pepsi Max 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Pepsi Twist 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "7up 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Mirinda 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Cockta 0,275", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Evervess Tonic 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Evervess Bitter Lemon 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Negazirani sokovi 0,2", category: "Sokovi i energetski napici", price: "270 RSD", desc: "Jabuka, đus, breskva, jagoda, mix" },
+      { name: "Cedevita 0,3", category: "Sokovi i energetski napici", price: "230 RSD", desc: "" },
+      { name: "Guarana 0,25", category: "Sokovi i energetski napici", price: "270 RSD", desc: "" },
+      { name: "Lipton Breskva 0,33", category: "Sokovi i energetski napici", price: "280 RSD", desc: "" },
+
+      // PIVA
+      { name: "Lav Premium 0,33", category: "Piva", price: "310 RSD", desc: "" },
+      { name: "Lav Premium 0,5", category: "Piva", price: "300 RSD", desc: "" },
+      { name: "Tuborg 0,33", category: "Piva", price: "310 RSD", desc: "" },
+      { name: "Carlsberg 0,25", category: "Piva", price: "310 RSD", desc: "" },
+      { name: "Kronenbourg 0,33", category: "Piva", price: "330 RSD", desc: "Citrus, berry" },
+      { name: "Budweiser 0,33", category: "Piva", price: "330 RSD", desc: "" },
+      { name: "Erdinger 0,33", category: "Piva", price: "450 RSD", desc: "" },
+      { name: "Tuborg Zero 0,33", category: "Piva", price: "310 RSD", desc: "" },
+
+      // TOČENO PIVO
+      { name: "Točeno pivo 0,3", category: "Točeno pivo", price: "250 RSD", desc: "" },
+      { name: "Točeno pivo 0,5", category: "Točeno pivo", price: "300 RSD", desc: "" },
+
+      // CIDER
+      { name: "Somersby 0,33", category: "Cider", price: "360 RSD", desc: "Jabuka, kruška, mango, borovnica, breskva" },
+
+      // RAKIJE
+      { name: "Dunja Ogijeva 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Kajsija Ogijeva 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Viljamovka Ogijeva 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Šljiva Žuta Osa 0,03", category: "Rakije", price: "315 RSD", desc: "" },
+      { name: "Žuta Dunja Šurlan 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Žuta Šljiva Šurlan 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Kajsija Šurlan 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+      { name: "Viljamovka Šurlan 0,03", category: "Rakije", price: "240 RSD", desc: "" },
+
+      // VINA
+      { name: "Tri Bele Koze 0,15/0,75", category: "Vina", price: "430 / 2150 RSD", desc: "" },
+      { name: "Tri Roze Koze 0,15/0,75", category: "Vina", price: "430 / 2150 RSD", desc: "" },
+      { name: "Tri Crvene Koze 0,15/0,75", category: "Vina", price: "430 / 2150 RSD", desc: "" },
+      { name: "Džervin Dubravka Gold 0,15/0,75", category: "Vina", price: "330 / 1650 RSD", desc: "" },
+      { name: "Džervin Romansa Gold 0,15/0,75", category: "Vina", price: "330 / 1650 RSD", desc: "" },
+      { name: "Džervin Despot Gold 0,15/0,75", category: "Vina", price: "330 / 1650 RSD", desc: "" },
+
+      // ALKOHOLNA PIĆA
+      { name: "Vodka Smirnoff 0,03", category: "Alkoholna pića", price: "270 RSD", desc: "" },
+      { name: "Rubin Vinjak 0,03", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Pelinkovac Gorki List 0,03", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Rum beli/tamni 0,03", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Vermouth 0,05", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Medovača Šurlan 0,03", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Malina Šurlan 0,03", category: "Alkoholna pića", price: "240 RSD", desc: "" },
+      { name: "Jägermeister 0,03", category: "Alkoholna pića", price: "290 RSD", desc: "" },
+      { name: "Campari 0,03", category: "Alkoholna pića", price: "290 RSD", desc: "" },
+      { name: "Baileys 0,03", category: "Alkoholna pića", price: "290 RSD", desc: "" },
+      { name: "Džin 0,03", category: "Alkoholna pića", price: "290 RSD", desc: "" },
+      { name: "So i Tekila 0,03", category: "Alkoholna pića", price: "250 RSD", desc: "" },
+
+      // WHISKEY
+      { name: "Jameson 0,03", category: "Whiskey", price: "340 RSD", desc: "" },
+      { name: "Jack Daniels 0,03", category: "Whiskey", price: "390 RSD", desc: "" },
+
+      // KOKTELI
+      { name: "Mojito 0,3", category: "Kokteli", price: "550 RSD", desc: "Rum, kisela voda, limeta, šećerni sirup, nana" },
+      { name: "Aperol Spritz 0,3", category: "Kokteli", price: "550 RSD", desc: "Aperol, penušavo vino, kisela voda" },
+      { name: "Cuba Libre 0,3", category: "Kokteli", price: "550 RSD", desc: "Rum, coca cola, limeta" },
+      { name: "Negroni 0,1", category: "Kokteli", price: "550 RSD", desc: "Džin, vermut, campari" },
+      { name: "Hugo Spritz 0,3", category: "Kokteli", price: "550 RSD", desc: "Penušavo vino, kisela voda, sirup od zove" },
+      { name: "Dunja Sour 0,1", category: "Kokteli", price: "550 RSD", desc: "Rakija dunja, limeta, šećerni sirup" },
+      { name: "Mango Sour 0,1", category: "Kokteli", price: "550 RSD", desc: "Džin, limun, voćni pire mango" },
+      { name: "Gin Tonic 0,3", category: "Kokteli", price: "550 RSD", desc: "Džin, tonic" },
+      { name: "Drvce Đus 0,4", category: "Kokteli", price: "550 RSD", desc: "Sok od narandže, vodka, pire od maline" },
+      { name: "Divlja kruška 0,4", category: "Kokteli", price: "550 RSD", desc: "Vodka, sirup od zove, limun, rakija kruška, kisela voda" },
+
+      // ...ZA UZ KAFU
+      { name: "Domaći kolačić", category: "...Za uz kafu", price: "250 RSD", desc: "" },
+      { name: "Domaći kolač", category: "...Za uz kafu", price: "450 RSD", desc: "" },
+      { name: "Puter kroasan", category: "Za uz kafu", price: "120 RSD", desc: "" },
+      { name: "Kroasan sa punjenjem", category: "...Za uz kafu", price: "180 RSD", desc: "" }
+    ];
+
+    let selectedCategory = "Sve";
+    const categories = ["Sve", ...new Set(MENU_ITEMS.map(item => item.category))];
+
+    const filtersEl = document.getElementById("categoryFilters");
+    const menuGridEl = document.getElementById("menuGrid");
+    const drinkHintEl = document.getElementById("drinkHint");
+    const reviewLinkEl = document.getElementById("googleReviewLink");
+
+    reviewLinkEl.href = GOOGLE_REVIEW_URL;
+
+    function renderFilters() {
+      filtersEl.innerHTML = "";
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `filter-btn ${cat === selectedCategory ? "active" : ""}`;
+        btn.textContent = cat;
+        btn.addEventListener("click", () => {
+          selectedCategory = cat;
+          renderFilters();
+          renderMenu();
+        });
+        filtersEl.appendChild(btn);
+      });
+    }
+
+    function renderMenu() {
+      const filtered = selectedCategory === "Sve"
+        ? MENU_ITEMS
+        : MENU_ITEMS.filter(item => item.category === selectedCategory);
+
+      menuGridEl.innerHTML = filtered.map(item => `
+        <article class="drink-item">
+          <div>
+            <div class="drink-name">${item.name}</div>
+            ${item.desc ? `<div class="drink-desc">${item.desc}</div>` : ""}
+          </div>
+          <div class="drink-price">${item.price}</div>
+        </article>
+      `).join("");
+    }
+
+    function populateDrinkHint() {
+      drinkHintEl.innerHTML =
+        `<option value="">— Izaberi šta si probao/la —</option>` +
+        MENU_ITEMS.map(item => `<option value="${item.name}">${item.name}</option>`).join("");
+    }
+
+    renderFilters();
+    renderMenu();
+    populateDrinkHint();
+  </script>
+</body>
+</html>
